@@ -24,6 +24,7 @@ app.get('/update/:arduino_unique_key', async (req,res)=>{
         })
         const {buzzer} = result[1][0]
         res.status(200).send(buzzer?'1':'0')
+        // res.status(200).json(JSON.stringify(result[1][0]))
     } catch (error) {
         console.log(error);
     }

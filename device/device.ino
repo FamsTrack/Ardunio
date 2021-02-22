@@ -17,10 +17,10 @@ SoftwareSerial* sim800_serial = new SoftwareSerial(RX_SIM800, TX_SIM800);
 
 SIM800L* sim800l;
 
-const char APN[] = "indosatooredo.com";
-//String SERVER = "https://16a874ac0a6d.ngrok.io";
+const char APN[] = "indosatooredoo.com";
+String SERVER = "http://1233de0ee101.ngrok.io";
 //String URL = SERVER+"/update/"+ARDUINO_UNIQUE_KEY;
-String URL = "https://16a874ac0a6d.ngrok.io/update/arduino1";
+String URL = "http://1233de0ee101.ngrok.io/update/arduino1";
 String query2;
 String dataposisi,latitude,longitude;
 unsigned long prev_time;
@@ -34,11 +34,11 @@ void setup(){
   Serial.begin(9600);
   gps_serial.begin(9600);
   sim800_serial->begin(9600);
-
+  sim800_serial->listen();
   sim800l = new SIM800L((Stream *)sim800_serial, RST_SIM800, 200, 512);
   setupModule();
 
-//  sim800_serial->flush();
+  sim800_serial->flush();
   gps_serial.listen();
   prev_time = millis();
 }
@@ -46,30 +46,32 @@ void setup(){
 void loop(){
   int panic_btn = digitalRead(PIN_PANIC_BTN);
   
-  while (gps_serial.available() > 0){
+  if (gps_serial.available() > 0){
     gps.encode(gps_serial.read());
 //    Serial.println("masuk kah");
+//    if (gps.location.isUpdated()){
+//      latitude = String(double(gps.location.lat()),6);
+//      longitude = String(double(gps.location.lng()),6);
+////      Serial.println(latitude+longitude);
+//    }
+  }
+
+  if(millis()-prev_time > delay_send){
     if (gps.location.isUpdated()){
       latitude = String(double(gps.location.lat()),6);
       longitude = String(double(gps.location.lng()),6);
 //      Serial.println(latitude+longitude);
     }
-  }
-
-  if(millis()-prev_time > delay_send){
-//    gps_serial.flush();
+    gps_serial.flush();
     sim800_serial->listen();
-    String panic_btn_str = !panic_btn? "true" : "false";
-    query2 = "?latitude="+latitude+"&longitude="+longitude+"&panic_btn="+panic_btn_str;
-//    sendData(payload_data);
-    String link = URL+query2;
-    Serial.println(latitude+longitude);
-    Serial.println(query2);
-    Serial.println(link);
-
-//    sim800_serial->flush();
+    delay(500);
+    query2 = "?latitude="+latitude+"&longitude="+longitude+"&panic_btn="+String(panic_btn);
+    
+     sendData("http://1233de0ee101.ngrok.io/update/arduino1"+query2); 
+    
+    sim800_serial->flush();
     gps_serial.listen();
-
+    delay(500);
     prev_time = millis();
   }
 

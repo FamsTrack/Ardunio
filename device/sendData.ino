@@ -1,5 +1,6 @@
-void sendData (String query){
+void sendData (String url){
   bool connected = false;
+
   for(uint8_t i = 0; i < 5 && !connected; i++) {
     delay(1000);
     connected = sim800l->connectGPRS();
@@ -16,10 +17,10 @@ void sendData (String query){
     return;
   }
 
-  Serial.println("GET : "+URL+query);
+  Serial.println(url);
 
   // Do HTTP GET communication with 10s for the timeout (read)
-  String tampung = URL+query;  
+  String tampung = url;  
   char char_array[tampung.length()+1];
   tampung.toCharArray(char_array,tampung.length()+1);
   uint16_t rc = sim800l->doGet(char_array, 10000);
