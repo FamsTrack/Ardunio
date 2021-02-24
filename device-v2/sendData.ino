@@ -1,10 +1,12 @@
 String sendData (String url){
   sim800_serial.listen();
+  sim800_serial.println("AT+SAPBR=1,1");
+  waitResponse();
   sim800_serial.println("AT+HTTPINIT");
   waitResponse();
   sim800_serial.println("AT+HTTPPARA=\"CID\",1");
   waitResponse();
-  Serial.println("GET: "+url);
+//  Serial.println("GET: "+url);
   sim800_serial.println("AT+HTTPPARA=\"URL\",\""+url+"\"");
   waitResponse();
   sim800_serial.println("AT+HTTPACTION=0");
@@ -23,7 +25,7 @@ String sendData (String url){
   sim800_serial.println("AT+HTTPTERM");
   waitResponse();
   sim800_serial.flush();
-  Serial.println(resp);
+//  Serial.println(resp);
   return resp;
 }  
 
